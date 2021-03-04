@@ -1,4 +1,5 @@
 import {Injectable} from "@angular/core";
+import {Observable, combineLatest} from "rxjs";
 
 /**
  * General components
@@ -52,7 +53,15 @@ export class I18nService {
   }
 
   public t(translateId:string, parameters?:{ [key:string]:any }):string {
-    return this._i18n.t(translateId, parameters);
+    const translation = this._i18n.t(translateId, parameters);
+
+    // Avoid returning empty translation strings and fall back to english instead
+    // due to translation bugs
+    if (translation === '') {
+      return this._i18n.t(translateId, { ...parameters, locale: 'en' })
+    } else {
+      return translation;
+    }
   }
 
   public lookup(translateId:string):boolean|undefined {
